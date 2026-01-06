@@ -37,6 +37,12 @@ test-results/
 .DS_Store
 Thumbs.db
 
+# Postgres
+.pgpass
+*.sql
+*.sql.gz
+*.dump
+
 # Project specific
 server.log
 celerybeat-schedule
