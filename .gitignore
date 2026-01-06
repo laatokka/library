@@ -1,0 +1,49 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+pythonenv*
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+test-results/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Postgres
+.pgpass
+*.sql
+*.sql.gz
+*.dump
+
+# Project specific
+server.log
+celerybeat-schedule
+celerybeat.pid
