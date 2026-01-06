@@ -26,6 +26,8 @@ SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-o#oo&0+bb8o1h%gvij=vn
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DEBUG", "True") == "True"
 
+TESTING = os.environ.get("TESTING") == "True"
+
 ALLOWED_HOSTS = []
 
 
@@ -44,8 +46,17 @@ INSTALLED_APPS = [
     "library",
 ]
 
+if DEBUG or TESTING:
+    INSTALLED_APPS += ["debug_toolbar"]
+
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+]
+
+if DEBUG or TESTING:
+    MIDDLEWARE += ["debug_toolbar.middleware.DebugToolbarMiddleware"]
+
+MIDDLEWARE += [
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -125,5 +136,14 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = "static/"
+
+if DEBUG or TESTING:
+    INTERNAL_IPS = [
+        "127.0.0.1",
+    ]
+
+    DEBUG_TOOLBAR_CONFIG = {
+        "SHOW_TOOLBAR_CALLBACK": lambda request: True,
+    }
 
 AUTH_USER_MODEL = "library.User"

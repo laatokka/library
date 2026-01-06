@@ -34,6 +34,14 @@ A modern Django project for managing a library, featuring:
     ```
 
 4.  **Database Setup**:
+
+    **Using Docker (Recommended):**
+    You can easily start the database using Docker Compose:
+    ```bash
+    docker-compose up -d
+    ```
+
+    **Manual Setup:**
     Ensure PostgreSQL is running and create a database (default `library_db`).
     Export environment variables if different from defaults:
     ```bash
