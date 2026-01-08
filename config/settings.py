@@ -46,14 +46,14 @@ INSTALLED_APPS = [
     "library",
 ]
 
-if DEBUG or TESTING:
+if DEBUG and not TESTING:
     INSTALLED_APPS += ["debug_toolbar"]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
 ]
 
-if DEBUG or TESTING:
+if DEBUG and not TESTING:
     MIDDLEWARE += ["debug_toolbar.middleware.DebugToolbarMiddleware"]
 
 MIDDLEWARE += [
@@ -137,13 +137,30 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 
-if DEBUG or TESTING:
+if DEBUG and not TESTING:
     INTERNAL_IPS = [
         "127.0.0.1",
     ]
 
     DEBUG_TOOLBAR_CONFIG = {
         "SHOW_TOOLBAR_CALLBACK": lambda request: True,
+    }
+
+if TESTING:
+    LOGGING = {
+        "version": 1,
+        "disable_existing_loggers": False,
+        "handlers": {
+            "console": {
+                "class": "logging.StreamHandler",
+            },
+        },
+        "loggers": {
+            "django.db.backends": {
+                "handlers": ["console"],
+                "level": "DEBUG",
+            },
+        },
     }
 
 AUTH_USER_MODEL = "library.User"
