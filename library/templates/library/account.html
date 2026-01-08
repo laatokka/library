@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}My Account - Library{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <c-card title="Profile">
+        <p><strong>Username:</strong> {{ user.username }}</p>
+        <p><strong>Email:</strong> {{ user.email }}</p>
+        <p><strong>Address:</strong> {{ user.address|default:"Not provided" }}</p>
+        <p><strong>Phone:</strong> {{ user.phone_number|default:"Not provided" }}</p>
+    </c-card>
+
+    <c-card title="My Loans">
+        {% if loans %}
+            <ul class="list-disc pl-5 space-y-1">
+                {% for loan in loans %}
+                    <li class="text-gray-800">
+                        <span class="font-semibold">{{ loan.book.name }}</span>
+                        <span class="text-sm text-gray-500">(Borrowed: {{ loan.loan_date }})</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>You have no active loans.</p>
+        {% endif %}
+    </c-card>
+</div>
+{% endblock %}
