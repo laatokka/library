@@ -15,6 +15,7 @@ class Book(models.Model):
     name = models.CharField(max_length=255)
     isbn = models.CharField(max_length=13, unique=True)
     pages = models.IntegerField()
+    nfc_tag = models.CharField(max_length=255, unique=True, null=True, blank=True)
 
     def __str__(self):
         return self.name
