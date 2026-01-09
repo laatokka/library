@@ -1,29 +1,65 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 
-{% block title %}My Account - Library{% endblock %}
+{% block title %}My Account{% endblock %}
 
 {% block content %}
-<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-    <c-card title="Profile">
-        <p><strong>Username:</strong> {{ user.username }}</p>
-        <p><strong>Email:</strong> {{ user.email }}</p>
-        <p><strong>Address:</strong> {{ user.address|default:"Not provided" }}</p>
-        <p><strong>Phone:</strong> {{ user.phone_number|default:"Not provided" }}</p>
-    </c-card>
+<div class="bg-white p-6 rounded shadow-md space-y-6">
+    <h1 class="text-2xl font-bold mb-4">My Account</h1>
 
-    <c-card title="My Loans">
-        {% if loans %}
-            <ul class="list-disc pl-5 space-y-1">
-                {% for loan in loans %}
-                    <li class="text-gray-800">
-                        <span class="font-semibold">{{ loan.book.name }}</span>
-                        <span class="text-sm text-gray-500">(Borrowed: {{ loan.loan_date }})</span>
-                    </li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p>You have no active loans.</p>
-        {% endif %}
-    </c-card>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+            <h2 class="text-xl font-semibold mb-2">Profile</h2>
+            <p><strong>Username:</strong> {{ user.username }}</p>
+            <p><strong>Email:</strong> {{ user.email }}</p>
+            <p><strong>Address:</strong> {{ user.address|default:"Not provided" }}</p>
+            <p><strong>Phone:</strong> {{ user.phone_number|default:"Not provided" }}</p>
+            <p><strong>Customer Since:</strong> {{ customer_since|date:"M d, Y" }}</p>
+        </div>
+
+        <div>
+            <h2 class="text-xl font-semibold mb-2">Stats</h2>
+            <p><strong>Favorite Genre:</strong> {{ favorite_genre|default:"Not enough data" }}</p>
+        </div>
+    </div>
+
+    <h2 class="text-xl font-semibold mt-6 mb-2">Loan History</h2>
+    {% if loans %}
+        <ul class="list-disc pl-5">
+        {% for loan in loans %}
+            <li class="mb-2">
+                <div class="flex items-center justify-between">
+                    <span>
+                        {{ loan.book.name }} ({{ loan.book.genre|default:"Unknown Genre" }}) - Loaned on {{ loan.loan_date }}
+                        {% if loan.return_date %}
+                        - Returned on {{ loan.return_date }}
+                        {% else %}
+                        - Currently Loaned
+                        {% endif %}
+                    </span>
+                    <form action="{% url 'toggle_book_read' loan.book.id %}" method="post" class="inline">
+                        {% csrf_token %}
+                        {% if loan.book.id in read_book_ids %}
+                            <button type="submit" class="bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-2 rounded text-sm">
+                                Marked as Read
+                            </button>
+                        {% else %}
+                            <button type="submit" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-1 px-2 rounded text-sm">
+                                Mark as Read
+                            </button>
+                        {% endif %}
+                    </form>
+                </div>
+            </li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>No loan history.</p>
+    {% endif %}
+
+    <div class="mt-8">
+        <a href="{% url 'download_user_data' %}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            Download My Data
+        </a>
+    </div>
 </div>
 {% endblock %}
