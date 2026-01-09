@@ -1,39 +1,39 @@
 import json
-from django.http import JsonResponse
+import re
+from datetime import datetime
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponse, JsonResponse
 from django.views.decorators.http import require_POST
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render
-from .models import Book, Loan
-from django.shortcuts import render, redirect
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.views.generic import ListView, DetailView
-from .models import Book, Loan
+from django.db.models import Count
+from .models import Book, Loan, UserData
 from .forms import CustomUserCreationForm
-from .models import Book
 
 def index(request):
+    books = Book.objects.all()
+
+    # Filtering by type
     book_type = request.GET.get('type')
     if book_type:
-        books = Book.objects.filter(book_type=book_type)
-    else:
-        books = Book.objects.all()
+        books = books.filter(book_type=book_type)
+
+    # Filtering by search (wildcard)
+    search_query = request.GET.get('search')
+    if search_query:
+        # Escape special regex characters
+        pattern = re.escape(search_query)
+        # Replace escaped wildcards with regex equivalents
+        pattern = pattern.replace(r'\*', '.*').replace(r'\?', '.')
+        books = books.filter(name__iregex=pattern)
 
     return render(request, 'index.html', {
         'books': books,
         'book_types': Book.BOOK_TYPES,
         'selected_type': book_type,
+        'search_query': search_query,
     })
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, JsonResponse
-from .models import UserData, Book
-from django.db.models import Count
-import json
-from datetime import datetime
-
-def index(request):
-    return render(request, 'index.html')
 
 @require_POST
 @login_required
@@ -63,6 +63,7 @@ def loan_book(request):
         'book': book.name,
         'loan_id': loan.id
     })
+
 def register(request):
     if request.method == "POST":
         form = CustomUserCreationForm(request.POST)
@@ -93,10 +94,6 @@ class BookDetailView(DetailView):
 
 @login_required
 def account(request):
-    loans = Loan.objects.filter(user=request.user)
-    return render(request, "library/account.html", {"loans": loans})
-@login_required
-def account_view(request):
     user = request.user
     # Ensure UserData exists
     user_data, created = UserData.objects.get_or_create(user=user)
@@ -110,7 +107,7 @@ def account_view(request):
         'favorite_genre': user_data.get_favorite_genre(),
         'read_book_ids': read_book_ids,
     }
-    return render(request, 'account.html', context)
+    return render(request, 'library/account.html', context)
 
 @login_required
 def toggle_book_read(request, book_id):
