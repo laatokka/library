@@ -10,7 +10,7 @@ def browser_context_args(browser_context_args):
 
 def test_home_page_title(page: Page, live_server):
     page.goto(live_server.url)
-    expect(page).to_have_title("Library System")
+    expect(page).to_have_title("Welcome to Your Library")
     # Updated to look for h3 because the cotton card component uses h3 for title
     expect(page.get_by_role("heading", name="Welcome to the Library")).to_be_visible()
 
