@@ -15,6 +15,16 @@ class Book(models.Model):
     name = models.CharField(max_length=255)
     isbn = models.CharField(max_length=13, unique=True)
     pages = models.IntegerField()
+    BOOK_TYPES = [
+        ('fantasy', 'Fantasy'),
+        ('science', 'Science'),
+        ('romance', 'Romance'),
+        ('horror', 'Horror'),
+        ('thriller', 'Thriller'),
+        ('history', 'History'),
+        ('biography', 'Biography'),
+    ]
+    book_type = models.CharField(max_length=20, choices=BOOK_TYPES, default='fantasy')
 
     def __str__(self):
         return self.name
