@@ -19,13 +19,20 @@ def django_db_setup(django_db_blocker):
         # Configure Django to use the container
         settings.DATABASES['default'] = {
             'ENGINE': 'django.db.backends.postgresql',
-            'NAME': postgres.POSTGRES_DB,
-            'USER': postgres.POSTGRES_USER,
-            'PASSWORD': postgres.POSTGRES_PASSWORD,
+            'NAME': postgres.dbname,
+            'USER': postgres.username,
+            'PASSWORD': postgres.password,
             'HOST': postgres.get_container_host_ip(),
             'PORT': postgres.get_exposed_port(5432),
             'ATOMIC_REQUESTS': False,
             'AUTOCOMMIT': True,
+            'OPTIONS': {},
+            'TEST': {
+                'MIRROR': None,
+            },
+            'TIME_ZONE': settings.TIME_ZONE,
+            'CONN_HEALTH_CHECKS': False,
+            'CONN_MAX_AGE': 0,
         }
 
         with django_db_blocker.unblock():

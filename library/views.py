@@ -12,7 +12,7 @@ from .models import Book, Loan, UserData
 from .forms import CustomUserCreationForm
 
 def index(request):
-    books = Book.objects.all()
+    books = Book.objects.select_related('location').all()
 
     # Filtering by type
     book_type = request.GET.get('type')
@@ -81,7 +81,7 @@ class BookListView(ListView):
     context_object_name = "books"
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        queryset = super().get_queryset().select_related('location')
         search_query = self.request.GET.get('search')
         if search_query:
             queryset = queryset.filter(name__icontains=search_query)
