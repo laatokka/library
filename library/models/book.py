@@ -16,6 +16,7 @@ class Book(models.Model):
     ]
     book_type = models.CharField(max_length=20, choices=BOOK_TYPES, default='fantasy')
     genre = models.CharField(max_length=100, blank=True, null=True)
+    location = models.ForeignKey('library.Location', on_delete=models.SET_NULL, null=True, blank=True, related_name='books')
 
     def __str__(self):
         return self.name
