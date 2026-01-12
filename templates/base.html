@@ -3,14 +3,144 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Library System{% endblock %}</title>
+    <title>{% block title %}Welcome to Your Library{% endblock %}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
     <script src="//unpkg.com/alpinejs" defer></script>
+    <style>
+        .floating-window {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        /* Custom scrollbar for better look */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #d4d4d8;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a1a1aa;
+        }
+    </style>
 </head>
-<body class="bg-gray-100 p-4">
-    <div class="container mx-auto">
-        {% block content %}{% endblock %}
+<body class="bg-gradient-to-br from-yellow-50 to-orange-50 min-h-screen font-sans text-gray-800">
+    <div class="flex h-screen overflow-hidden p-6 gap-6">
+
+        <!-- Left Vertical Panel -->
+        <aside class="w-80 flex-shrink-0 flex flex-col gap-6">
+
+            <!-- Branding / Search / Auth Panel -->
+            <div class="bg-white rounded-2xl p-6 floating-window border-l-4 border-orange-400 flex flex-col gap-6">
+
+                <!-- Title / Brand -->
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-800 tracking-tight">
+                        <a href="{% url 'index' %}" class="hover:text-orange-600 transition-colors">Your Library</a>
+                    </h1>
+                    <p class="text-sm text-gray-500 mt-1">Welcome back!</p>
+                </div>
+
+                <!-- Search Window -->
+                <div class="relative">
+                    <label for="search" class="sr-only">Search</label>
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <input type="text" name="search" id="search"
+                           class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-xl leading-5 bg-gray-50 placeholder-gray-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-orange-200 focus:border-orange-300 sm:text-sm transition duration-150 ease-in-out shadow-sm"
+                           placeholder="Search books..."
+                           hx-get="{% url 'book-list' %}"
+                           hx-trigger="keyup changed delay:500ms, search"
+                           hx-target="#main-content"
+                           hx-select="#main-content"
+                           hx-swap="outerHTML"
+                           hx-push-url="true">
+                </div>
+
+                <!-- Auth Section -->
+                {% if user.is_authenticated %}
+                    <div class="space-y-3 pt-4 border-t border-gray-100">
+                        <div class="flex items-center space-x-3">
+                            <div class="bg-green-100 text-green-700 rounded-full h-10 w-10 flex items-center justify-center font-bold">
+                                {{ user.username|first|upper }}
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <a href="{% url 'account' %}" class="text-sm font-medium text-gray-900 truncate hover:text-orange-600 block">
+                                    {{ user.username }}
+                                </a>
+                                <p class="text-xs text-gray-500 truncate">Member</p>
+                            </div>
+                        </div>
+
+                        <nav class="space-y-1">
+                            <a href="{% url 'account' %}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-lg hover:bg-orange-50 hover:text-orange-700 group transition-colors">
+                                <span class="truncate">My Account</span>
+                            </a>
+                             <!-- Loans Link as requested ("When logged in you can see Loans") -->
+                            <a href="{% url 'account' %}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-lg hover:bg-orange-50 hover:text-orange-700 group transition-colors">
+                                <span class="truncate">Loans</span>
+                                <!-- Badge example (optional, logic needed in view context) -->
+                                <!-- <span class="ml-auto inline-block py-0.5 px-2 text-xs font-medium rounded-full bg-orange-100 text-orange-600">3</span> -->
+                            </a>
+                             <form action="{% url 'logout' %}" method="post" class="w-full">
+                                {% csrf_token %}
+                                <button type="submit" class="w-full text-left flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-lg hover:bg-red-50 hover:text-red-700 group transition-colors">
+                                    Sign Out
+                                </button>
+                            </form>
+                        </nav>
+                    </div>
+                {% else %}
+                    <div class="space-y-3 pt-4 border-t border-gray-100">
+                         <!-- Login / Register "In the left vertical panel" -->
+                         <p class="text-xs text-gray-500 uppercase tracking-wide font-semibold">Member Access</p>
+
+                         <a href="{% url 'login' %}" class="block w-full text-center px-4 py-2 border border-transparent text-sm font-medium rounded-xl text-white bg-orange-500 hover:bg-orange-600 shadow-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500">
+                            Log In
+                         </a>
+                         <a href="{% url 'register' %}" class="block w-full text-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-xl text-gray-700 bg-white hover:bg-gray-50 shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500">
+                            Register
+                         </a>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Navigation Links -->
+             <div class="bg-white rounded-2xl p-4 floating-window border-l-4 border-yellow-400">
+                <nav class="space-y-1">
+                    <a href="{% url 'book-list' %}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-lg hover:bg-yellow-50 hover:text-yellow-700 transition-colors">
+                        Browse Books
+                    </a>
+                </nav>
+            </div>
+
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 bg-white rounded-3xl floating-window overflow-hidden flex flex-col relative border-t-8 border-green-400">
+            <!-- Scrollable Content -->
+            <div class="flex-1 overflow-y-auto p-8" id="main-content">
+                {% if messages %}
+                    <div class="mb-6 space-y-2">
+                        {% for message in messages %}
+                            <div class="p-4 rounded-xl {% if message.tags == 'error' %}bg-red-50 text-red-700 border border-red-200{% else %}bg-green-50 text-green-700 border border-green-200{% endif %}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+
     </div>
 </body>
 </html>

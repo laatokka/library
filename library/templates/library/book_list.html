@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Books - Library{% endblock %}
+
+{% block content %}
+<c-card title="Book List">
+    {% if books %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {% for book in books %}
+                <div class="border p-4 rounded-lg hover:shadow-md transition-shadow bg-yellow-50 border-orange-200">
+                    <h3 class="font-bold text-lg text-green-800">
+                        <a href="{% url 'book-detail' book.pk %}">{{ book.name }}</a>
+                    </h3>
+                    <p class="text-sm text-gray-600">ISBN: {{ book.isbn }}</p>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>No books available.</p>
+    {% endif %}
+</c-card>
+{% endblock %}

@@ -23,7 +23,7 @@ urlpatterns = [
     path('', include('library.urls')),
 ]
 
-if settings.DEBUG or settings.TESTING:
+if "debug_toolbar" in settings.INSTALLED_APPS:
     import debug_toolbar
     urlpatterns += [
         path('__debug__/', include(debug_toolbar.urls)),
